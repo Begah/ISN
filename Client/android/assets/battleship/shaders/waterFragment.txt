@@ -1,0 +1,19 @@
+#ifdef GL_ES
+precision mediump float;
+#endif 
+
+uniform float time;
+uniform sampler2D texture;
+
+uniform vec2 redstart;
+uniform vec2 redend;
+
+varying vec2 v_uv;
+varying vec2 v_position;
+
+void main(void) {
+	if(v_position.x < redstart.x || v_position.y < redstart.y || v_position.x > redend.x || v_position.y > redend.y)
+		gl_FragColor = texture2D(texture, v_uv);
+	else
+		gl_FragColor = vec4(1, 0, 0, 1);
+}
