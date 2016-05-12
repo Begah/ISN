@@ -98,7 +98,7 @@ public class Pendu implements Scene, TimerCallback {
 		
 		final Random rand = new Random();
 		mot = mots.get(rand.nextInt(mots.size()));
-		System.out.println(mot);
+		System.out.println("Mot a deviner Server : " + mot);
 		return mot;
 	}
 
@@ -160,6 +160,7 @@ public class Pendu implements Scene, TimerCallback {
 			
 			stage.addActor(table);
 		}
+
 		if(manager.isServer() && joueurFini && autreJoueurFini && partieEnCour) { // Fin de parti, nouvelle parti
 			if(autreJoueurReussi == false && joueurReussi == true) {
 				pointJoueur += 3;
@@ -251,9 +252,6 @@ public class Pendu implements Scene, TimerCallback {
 	@Override
 	public void event(String message) {
 		switch(message) {
-		case "Pendu Mot Choisit":
-			motADeviner = MainClass.client.readString();
-			break;
 		case "Pendu Joueur Fini":
 			autreJoueurFini = true;
 			autreJoueurReussi = MainClass.client.readBool();

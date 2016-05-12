@@ -21,8 +21,13 @@ public class Puissance4 implements Scene, TimerCallback {
 	Texture imageCase, imageJeton1, imageJeton2;   //definition des images
 	
 	final int JetonVitesse = 4;
-	Vector2 jetonDescendant = new Vector2(-1, -1), jetonAajouter = new Vector2();
-	float stopAtY; int jetonAjouterJoueur;
+
+	class JetonDescendant {
+		Vector2 position = new Vector2(-1, -1), positionGrille = new Vector2();
+		float stopAtY; int joueur;
+	}
+
+	JetonDescendant jeton1 = null, jeton2 = null;
 	
 	Stage stage;
 	Skin skin;                                      //type de texte (autre fichier)
@@ -55,35 +60,7 @@ public class Puissance4 implements Scene, TimerCallback {
 		skin = new Skin(Gdx.files.internal("skin/uiskin.json")); //pour presentation textes
 		labelTourDeJoueur = new Label("C'est a l'autre de jouer", skin);
 		stage.addActor(labelTourDeJoueur);
-		
-		stage.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				if(jouerTourDeJouer == true && entrainDeJouer == true) {
-					float caseWidth = Gdx.graphics.getWidth() / 7.0f;
-					
-					int xx = (int)(x / caseWidth); //definition place du jeton
-					
-					for(int yy = 0; yy < 6; yy++) {
-						if(cases[xx][yy] == 0) {						
-							MainClass.client.sendString("Puissance4 place jeton");
-							MainClass.client.sendInt(xx);
-							MainClass.client.sendInt(yy);
-							
-							jetonDescendant.set(xx * (Gdx.graphics.getWidth() / 7.0f), Gdx.graphics.getHeight());
-							jetonAajouter.set(xx, yy);
-							stopAtY = yy * (Gdx.graphics.getHeight() / 6.25f);
-							if(manager.isServer()) {
-								jetonAjouterJoueur = 1;
-							} else {
-								jetonAjouterJoueur = 2;
-							}
-							break;
-						}
-					}
-				}
-			}
-		});
+
 		Gdx.input.setInputProcessor(stage);
 		
 		if(manager.isServer()) {			
@@ -142,6 +119,31 @@ public class Puissance4 implements Scene, TimerCallback {
 			labelTourDeJoueur.setText("A " + manager.adversary.username + " de jouer");
 		labelTourDeJoueur.setSize(labelTourDeJoueur.getPrefWidth(), labelTourDeJoueur.getPrefHeight());
 		labelTourDeJoueur.setPosition(Gdx.graphics.getWidth() / 2.0f - labelTourDeJoueur.getWidth() / 2.0f, Gdx.graphics.getHeight() - labelTourDeJoueur.getHeight());
+
+		if(Gdx.input.justTouched() && jouerTourDeJouer == true && entrainDeJouer == true) {
+			float caseWidth = Gdx.graphics.getWidth() / 7.0f;
+
+			int xx = (int)(Gdx.input.getX() / caseWidth); //definition place du jeton
+
+			for(int yy = 0; yy < 6; yy++) {
+				if(cases[xx][yy] == 0) {
+					MainClass.client.sendString("Puissance4 place jeton");
+					MainClass.client.sendInt(xx);
+					MainClass.client.sendInt(yy);
+
+					jeton1 = new JetonDescendant();
+					jeton1.position.set(xx * (Gdx.graphics.getWidth() / 7.0f), Gdx.graphics.getHeight());
+					jeton1.positionGrille.set(xx, yy);
+					jeton1.stopAtY = yy * (Gdx.graphics.getHeight() / 6.25f);
+					if(manager.isServer()) {
+						jeton1.joueur = 1;
+					} else {
+						jeton1.joueur = 2;
+					}
+					break;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -151,13 +153,17 @@ public class Puissance4 implements Scene, TimerCallback {
 		float caseWidth = Gdx.graphics.getWidth() / 7.0f;
 		float caseHeight = Gdx.graphics.getHeight() / 6.25f;
 		
-		if(jetonDescendant.epsilonEquals(-1, -1, 0) == false) {
-			spriteBatch.draw(jetonAjouterJoueur == 1 ? imageJeton1 : imageJeton2, jetonDescendant.x, jetonDescendant.y, caseWidth, caseHeight);
-			jetonDescendant.y -= JetonVitesse;
+		if(jeton1 != null) {
+			spriteBatch.draw(jeton1.joueur == 1 ? imageJeton1 : imageJeton2, jeton1.position.x, jeton1.position.y, caseWidth, caseHeight);
+			jeton1.position.y -= JetonVitesse;
 			
-			if(jetonDescendant.y <= stopAtY) {
-				cases[(int)jetonAajouter.x][(int)jetonAajouter.y] = jetonAjouterJoueur;
-				jetonDescendant.set(-1, -1);
+			if(jeton1.position.y <= jeton1.stopAtY) {
+				cases[(int)jeton1.positionGrille.x][(int)jeton1.positionGrille.y] = jeton1.joueur;
+				jeton1 = null;
+				if(jeton2 != null) {
+					jeton1 = jeton2;
+					jeton2 = null;
+				}
 				
 				jouerTourDeJouer = !jouerTourDeJouer;
 			}
@@ -182,7 +188,6 @@ public class Puissance4 implements Scene, TimerCallback {
 	@Override
 	public void timerCallback(String name) {
 		// Partie fini, renvoyer le controle a l'application
-		
 		boolean aGagner = false;
 		if(manager.isServer() && gagnant == 1)
 			aGagner = true;
@@ -202,14 +207,21 @@ public class Puissance4 implements Scene, TimerCallback {
 		switch(message) {
 		case "Puissance4 place jeton":
 			int x = MainClass.client.readInt(); int y = MainClass.client.readInt();
-			jetonDescendant.set(x * (Gdx.graphics.getWidth() / 7.0f), Gdx.graphics.getHeight());
-			jetonAajouter.set(x, y);
-			stopAtY = y * (Gdx.graphics.getHeight() / 6.25f);
+
+			JetonDescendant jeton = new JetonDescendant();
+			jeton.position.set(x * (Gdx.graphics.getWidth() / 7.0f), Gdx.graphics.getHeight());
+			jeton.positionGrille.set(x, y);
+			jeton.stopAtY = y * (Gdx.graphics.getHeight() / 6.25f);
 			if(manager.isServer()) {
-				jetonAjouterJoueur = 2;
+				jeton.joueur = 2;
 			} else {
-				jetonAjouterJoueur = 1;
+				jeton.joueur = 1;
 			}
+
+			if(jeton1 != null)
+				jeton2 = jeton;
+			else
+				jeton1 = jeton;
 			break;
 		case "Puissance4 Gagnant":
 			entrainDeJouer = false;

@@ -3,6 +3,7 @@ package com.client.game;
 import com.client.core.MainClass;
 import com.client.core.OtherClient;
 import com.client.core.Scene;
+import com.client.game.pendu.Pendu;
 import com.client.menu.SocialHub;
 
 public class Manager implements Scene {
@@ -48,6 +49,11 @@ public class Manager implements Scene {
 			
 			gameName = null;
 		}
+
+		if(penduString != null && currentScene instanceof Pendu) {
+			((Pendu) currentScene).motADeviner = penduString;
+			penduString = null;
+		}
 		
 		currentScene.update();
 	}
@@ -90,8 +96,14 @@ public class Manager implements Scene {
 			changeScene(new SelectionScreen(this));
 	}
 
+	String penduString = null;
 	@Override
 	public void event(String message) {
+		switch (message) {
+		case "Pendu Mot Choisit":
+				penduString = MainClass.client.readString();
+			break;
+		}
 		currentScene.event(message);
 	}
 
