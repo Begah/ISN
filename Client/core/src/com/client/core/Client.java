@@ -82,10 +82,11 @@ public class Client extends Thread {
 				if(str.equals("ping")) {
 				} else if(str.equals("Connection")) {
 					int id = in.readInt(); String username = in.readUTF(); boolean isPlaying = in.readBoolean();
+					System.out.println("New connection : " + username + " with id : " + id);
 					
-					OtherClient oClient;
-					otherClients.add(oClient = new OtherClient(id, username, isPlaying));
+					OtherClient oClient = new OtherClient(id, username, isPlaying);
 					MainClass.getCurrentScene().connection(oClient);
+					otherClients.add(oClient);
 				} else if(str.equals("Disconnection")) {
 					int id = in.readInt();
 					OtherClient oClient = null;
@@ -110,7 +111,7 @@ public class Client extends Thread {
 					}
 					MainClass.getCurrentScene().clientUpdated(oClient);
 				} else {
-					System.out.println(str);
+					System.out.println("Message recieved : " + str);
 					MainClass.getCurrentScene().event(str);
 				}
 			} catch (IOException e) {

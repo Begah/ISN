@@ -101,7 +101,10 @@ public class Manager implements Scene {
 	public void event(String message) {
 		switch (message) {
 		case "Pendu Mot Choisit":
-				penduString = MainClass.client.readString();
+			penduString = MainClass.client.readString();
+			break;
+        case "Pick Game":
+            wonLastGame = MainClass.client.readBool();
 			break;
 		}
 		currentScene.event(message);

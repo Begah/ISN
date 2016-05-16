@@ -84,14 +84,16 @@ public class SelectionScreen implements Scene {
 		table.row();
 		
 		stage.addActor(table);
+
+		isPicking = manager.wonLastGame;
+		if(isPicking)
+			showGameChoosing = true;
 		
 		if(manager.isServer()) {
-			isPicking = manager.wonLastGame;
 			MainClass.client.sendString("Pick Game");
 			MainClass.client.sendBool(!isPicking); // For other player, it is the inverse of isPicking
 			
-			if(isPicking)
-				setUpPicking();
+			showGameChoosing = true;
 		}
 		
 		Gdx.input.setInputProcessor(stage);
@@ -197,9 +199,10 @@ public class SelectionScreen implements Scene {
 	public void event(String message) {
 		switch(message) {
 		case "Pick Game":
-			this.isPicking = MainClass.client.readBool();
-			this.manager.wonLastGame = this.isPicking;
-			showGameChoosing = true;
+			if(isPicking == false) {
+				showGameChoosing = true;
+			}
+			isPicking = manager.wonLastGame;
 			break;
 		case "Game Chosen":
 			manager.gameName = MainClass.client.readString();

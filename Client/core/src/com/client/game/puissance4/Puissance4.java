@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -20,7 +19,7 @@ public class Puissance4 implements Scene, TimerCallback {
 	int [][] cases = new int[7][6];                //definition cases tableau
 	Texture imageCase, imageJeton1, imageJeton2;   //definition des images
 	
-	final int JetonVitesse = 4;
+	int JetonVitesse = 4;
 
 	class JetonDescendant {
 		Vector2 position = new Vector2(-1, -1), positionGrille = new Vector2();
@@ -62,6 +61,8 @@ public class Puissance4 implements Scene, TimerCallback {
 		stage.addActor(labelTourDeJoueur);
 
 		Gdx.input.setInputProcessor(stage);
+
+		JetonVitesse = Gdx.graphics.getHeight() / Gdx.graphics.getFramesPerSecond();
 		
 		if(manager.isServer()) {			
 			jouerTourDeJouer = true;
@@ -72,21 +73,36 @@ public class Puissance4 implements Scene, TimerCallback {
 		int winner = 0;
 		
 		Quit:
-		for(int x = 0; x < 4; x++) {
-			for(int y = 0; y < 3; y++) {
+		for(int x = 0; x < 7; x++) {
+			for(int y = 0; y < 6; y++) {
 				if(cases[x][y] == 0)
 					continue;
-				if(cases[x][y] == cases[x + 1][y] && cases[x][y] == cases[x + 2][y] && cases[x][y] == cases[x + 3][y]) { //alignement 4 jetons sur x
-					winner = cases[x][y];
-					break Quit;
+				if(x <= 3) {
+					if(cases[x][y] == cases[x + 1][y] && cases[x][y] == cases[x + 2][y] && cases[x][y] == cases[x + 3][y]) { //alignement 4 jetons sur x
+						winner = cases[x][y];
+						break Quit;
+					}
 				}
-				if(cases[x][y] == cases[x][y + 1] && cases[x][y] == cases[x][y + 2] && cases[x][y] == cases[x][y + 3]) { //alignement 4 jetons sur y
-					winner = cases[x][y];
-					break Quit; //break = 2�me pas soumis � premier
+				
+				if(y <= 2) {
+					if(cases[x][y] == cases[x][y + 1] && cases[x][y] == cases[x][y + 2] && cases[x][y] == cases[x][y + 3]) { //alignement 4 jetons sur y
+						winner = cases[x][y];
+						break Quit; //break = 2�me pas soumis � premier
+					}
 				}
-				if(cases[x][y] == cases[x + 1][y + 1] && cases[x][y] == cases[x + 2][y + 2] && cases[x][y] == cases[x + 3][y + 3]) { // alignement 4 jetons sur x et y
-					winner = cases[x][y];
-					break Quit;
+				
+				if(x <= 3 && y <= 2) {
+					if(cases[x][y] == cases[x + 1][y + 1] && cases[x][y] == cases[x + 2][y + 2] && cases[x][y] == cases[x + 3][y + 3]) { // alignement 4 jetons sur x et y
+						winner = cases[x][y];
+						break Quit;
+					}
+				}
+
+				if(x >= 3 && y <= 2) {
+					if(cases[x][y] == cases[x - 1][y + 1] && cases[x][y] == cases[x - 2][y + 2] && cases[x][y] == cases[x - 3][y + 3]) { // alignement 4 jetons sur x et y
+						winner = cases[x][y];
+						break Quit;
+					}
 				}
 			}
 		}

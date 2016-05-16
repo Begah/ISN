@@ -41,6 +41,8 @@ public class SocialHub implements Scene {
 	private Label gameRequestLabel;
 	
 	private TextButtonStyle WhiteText, RedText;
+
+	private boolean hasBeenInited = false;
 	
 	public boolean StagehasActor(Actor actor) {
 		for(int i = 0; i < stage.getActors().size; i++) {
@@ -60,6 +62,10 @@ public class SocialHub implements Scene {
 			this.user = user;
 			
 			configure();
+
+			if(clientOnline == null) {
+				System.err.println("WTF clientonline null");
+			}
 			
 			clientOnline.add(this).minWidth(clientOnline.getWidth() - clientOnline.getPadLeft() - clientOnline.getPadRight());
 			clientOnline.row();
@@ -195,8 +201,11 @@ public class SocialHub implements Scene {
 		Gdx.input.setInputProcessor(stage);
 		
 		for(int i = 0; i < MainClass.client.otherClients.size(); i++) {
+			System.out.println("Client addition in init : " + MainClass.client.otherClients.get(i).username);
 			clientButtons.add(new ClientButton(MainClass.client.otherClients.get(i)));
 		}
+
+		hasBeenInited = true;
 	}
 
 	@Override
@@ -254,6 +263,8 @@ public class SocialHub implements Scene {
 	
 	@Override
 	public void connection(OtherClient user) {
+		if(hasBeenInited == false) return;
+		System.out.println("Adding connection of user : " + user.username);
 		clientButtons.add(new ClientButton(user));
 	}
 	
