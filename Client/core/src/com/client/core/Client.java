@@ -38,7 +38,7 @@ public class Client extends Thread {
 	
 	@Override
 	public void run() {
-		try { //  InetAddress.getLocalHost().getHostName()
+		try { //  InetAddress.getLocalHost().getHostName() InetAddress.getByName("matrouxclient.ddns.net").getHostAddress()
 			socket = new Socket(InetAddress.getByName("matrouxclient.ddns.net").getHostAddress(), PORT);
 
 			OS = socket.getOutputStream();

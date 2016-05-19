@@ -61,8 +61,6 @@ public class Puissance4 implements Scene, TimerCallback {
 		stage.addActor(labelTourDeJoueur);
 
 		Gdx.input.setInputProcessor(stage);
-
-		JetonVitesse = Gdx.graphics.getHeight() / Gdx.graphics.getFramesPerSecond();
 		
 		if(manager.isServer()) {			
 			jouerTourDeJouer = true;
@@ -168,6 +166,8 @@ public class Puissance4 implements Scene, TimerCallback {
 		
 		float caseWidth = Gdx.graphics.getWidth() / 7.0f;
 		float caseHeight = Gdx.graphics.getHeight() / 6.25f;
+		
+		JetonVitesse = Gdx.graphics.getHeight() / Gdx.graphics.getFramesPerSecond();
 		
 		if(jeton1 != null) {
 			spriteBatch.draw(jeton1.joueur == 1 ? imageJeton1 : imageJeton2, jeton1.position.x, jeton1.position.y, caseWidth, caseHeight);

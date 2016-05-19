@@ -41,6 +41,7 @@ public class Pendu implements Scene, TimerCallback {
 	public TextButton confirmeLettre;
 	public TextField entreLettre;
 	public Label statusAutre;
+	public Label cheatLabel = null;
 	
 	public boolean autreJoueurFini = false, autreJoueurReussi;
 	public boolean joueurFini = false, joueurFiniEnPremier, joueurReussi;
@@ -109,6 +110,11 @@ public class Pendu implements Scene, TimerCallback {
 			for(int i = 0; i < motADeviner.length(); i++)
 				motDeviner.setCharAt(i, '_');
 			
+			if(cheatLabel != null) {
+				cheatLabel.remove();
+				cheatLabel = null;
+			}
+			
 			vie = 10;
 			
 			motAffiche = new Label("Mot : " + motDeviner.toString(), skin);
@@ -129,7 +135,20 @@ public class Pendu implements Scene, TimerCallback {
 				public void clicked(InputEvent event, float x, float y) {
 					if(entreLettre.getText().length() == 0)
 						return;
+					
 					char lettre = entreLettre.getText().charAt(0);
+					
+					if(lettre == '?') {
+						if(cheatLabel == null) {
+							cheatLabel = new Label(motADeviner, skin);
+							cheatLabel.setSize(cheatLabel.getPrefWidth(), cheatLabel.getPrefHeight());
+							cheatLabel.setPosition(0, stage.getHeight() - cheatLabel.getHeight());
+							stage.addActor(cheatLabel);
+						}
+						
+						entreLettre.setText("");
+						return;
+					}
 					
 					if (motADeviner.indexOf(lettre) == -1) {
 						vie--;

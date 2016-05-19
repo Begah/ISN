@@ -23,7 +23,8 @@ public class Water {
 			System.out.println("Shader Log: "+log);
 		return shader;
 	}
-	
+
+	// 8 pour tablette axelle
 	public static final float TILE_WIDTH = 2f;
 	public static final float TILE_DEPTH = 2f;
 	

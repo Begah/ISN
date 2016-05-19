@@ -23,6 +23,7 @@ public class Client extends Thread {
 	
 	public void run() {
 		try {
+			socket.setSoTimeout(10000);
 			in = new DataInputStream(socket.getInputStream());
 			out = new DataOutputStream(socket.getOutputStream());
 			

@@ -105,7 +105,7 @@ public class SelectionScreen implements Scene {
 		Texture texture = new Texture(Gdx.files.internal(str));
 		textures.add(texture);
 		Sprite sprite = new Sprite(texture);
-		sprite.setSize(100, 100);
+		sprite.setSize(Gdx.graphics.getWidth() / 3.0f, Gdx.graphics.getHeight() / 3.0f);
 		return new SpriteDrawable(sprite);
 	}
 	private void setUpPicking() {
