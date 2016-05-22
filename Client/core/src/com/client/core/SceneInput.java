@@ -1,6 +1,6 @@
 package com.client.core;
 
-public interface  SceneInput {
+public interface SceneInput {
     public boolean keyDown(int keycode);
     public boolean keyUp(int keycode);
     public boolean keyTyped(char character);

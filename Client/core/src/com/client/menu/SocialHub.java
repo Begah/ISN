@@ -62,10 +62,6 @@ public class SocialHub implements Scene {
 			this.user = user;
 			
 			configure();
-
-			if(clientOnline == null) {
-				System.err.println("WTF clientonline null");
-			}
 			
 			clientOnline.add(this).minWidth(clientOnline.getWidth() - clientOnline.getPadLeft() - clientOnline.getPadRight());
 			clientOnline.row();

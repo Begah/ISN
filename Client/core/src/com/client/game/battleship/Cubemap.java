@@ -1,3 +1,6 @@
+/* Author : Nolesh
+ * http://stackoverflow.com/questions/21884805/libgdx-0-9-9-apply-cubemap-in-environment  */
+
 package com.client.game.battleship;
 
 import com.badlogic.gdx.Gdx;
@@ -19,7 +22,7 @@ public class Cubemap implements Disposable {
 	protected final Pixmap[] data = new Pixmap[6];
 	protected ShaderProgram shader;
 
-	protected int u_worldTrans, u_plane;
+	protected int u_worldTrans;
 	protected Mesh quad;
 	private Matrix4 worldTrans;
 	private Quaternion q;
@@ -105,7 +108,6 @@ public class Cubemap implements Disposable {
 			throw new GdxRuntimeException(shader.getLog());
 
 		u_worldTrans = shader.getUniformLocation("u_worldTrans");
-		u_plane = shader.getUniformLocation("plane");
 
 		quad = createQuad();
 		worldTrans = new Matrix4();
@@ -155,7 +157,6 @@ public class Cubemap implements Disposable {
 
 		shader.begin();
 		shader.setUniformMatrix(u_worldTrans, worldTrans.translate(0, 0, -1));
-		shader.setUniform4fv(u_plane, new float[] { 0, 0, 0, 0 }, 0, 4);
 
 		quad.render(shader, GL20.GL_TRIANGLES);
 		shader.end();
@@ -172,8 +173,7 @@ public class Cubemap implements Disposable {
 
 		shader.begin();
 		shader.setUniformMatrix(u_worldTrans, worldTrans.translate(0, 0, -1));
-		shader.setUniform4fv(u_plane, new float[] { 0, 0, 0, 0 }, 0, 4);//shader.setUniform4fv(u_plane, new float[] { 0, plane.x, 0, plane.y }, 0, 4);
-
+		
 		quad.render(shader, GL20.GL_TRIANGLES);
 		shader.end();
 	}

@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -49,6 +51,8 @@ public class Pendu implements Scene, TimerCallback {
 	
 	private int pointJoueur = 0, pointAdversaire = 0;
 	
+	public Image[] imagePendus = new Image[11];
+	
 	public Pendu(Manager manager) {
 		this.manager = manager;
 	}
@@ -72,6 +76,10 @@ public class Pendu implements Scene, TimerCallback {
 		scoreAffiche = new Label(MainClass.client.getUsername() + " : " + String.valueOf(pointJoueur) + " | " + manager.adversary.username + " : " + String.valueOf(pointAdversaire), skin);
 		table.add(scoreAffiche);
 		table.row();
+		
+		for(int i = 1; i <= 11; i++) {
+			imagePendus[i - 1] = new Image(new Texture(Gdx.files.internal("pendu/p" + String.valueOf(i) + ".JPG")));
+		}
 		
 		Gdx.input.setInputProcessor(stage);
 	}
@@ -115,7 +123,7 @@ public class Pendu implements Scene, TimerCallback {
 				cheatLabel = null;
 			}
 			
-			vie = 10;
+			vie = 11;
 			
 			motAffiche = new Label("Mot : " + motDeviner.toString(), skin);
 			table.add(motAffiche);table.row();
@@ -155,6 +163,9 @@ public class Pendu implements Scene, TimerCallback {
 
 						if (vie == 0) {
 							roundFinished(false);
+						} else {
+							imagePendus[10 - vie].remove(); 
+							stage.addActor(imagePendus[11 - vie]); 
 						}
 					} else {
 						int index = motADeviner.indexOf(lettre);
@@ -177,10 +188,18 @@ public class Pendu implements Scene, TimerCallback {
 			statusAutre = new Label("Other player is guessing", skin);
 			table.add(statusAutre);
 			
-			stage.addActor(table);
+			table.layout();
+			
+			for(int i = 0; i < imagePendus.length; i++) {
+				imagePendus[i].setPosition(confirmeLettre.getX() + confirmeLettre.getWidth() + 40, confirmeLettre.getY());
+				
+				imagePendus[i].remove(); 
+			}
+			stage.addActor(imagePendus[0]);
 		}
 
 		if(manager.isServer() && joueurFini && autreJoueurFini && partieEnCour) { // Fin de parti, nouvelle parti
+			
 			if(autreJoueurReussi == false && joueurReussi == true) {
 				pointJoueur += 3;
 				if(joueurFiniEnPremier == true) // Autre joueurs perd et fini dernier
@@ -272,7 +291,6 @@ public class Pendu implements Scene, TimerCallback {
 	public void event(String message) {
 		switch(message) {
 		case "Pendu Joueur Fini":
-			autreJoueurFini = true;
 			autreJoueurReussi = MainClass.client.readBool();
 			
 			if(autreJoueurReussi) {
@@ -280,6 +298,8 @@ public class Pendu implements Scene, TimerCallback {
 			} else {
 				statusAutre.setText(manager.adversary.username + " has failed");
 			}
+			
+			autreJoueurFini = true;
 			break;
 		case "Pendu Points":
 			pointJoueur = MainClass.client.readInt();
